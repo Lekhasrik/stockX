@@ -71,22 +71,56 @@ function Login({ setIsAdmin }) {
     }
   };
 
+  // return (
+  //   <form onSubmit={handleSubmit}>
+  //     <h2>Admin Login</h2>
+  //     <input
+  //       type="email"
+  //       placeholder="Email"
+  //       onChange={(e) => setEmail(e.target.value)}
+  //     />
+  //     <input
+  //       type="password"
+  //       placeholder="Password"
+  //       onChange={(e) => setPassword(e.target.value)}
+  //     />
+  //     <button type="submit">Login</button>
+  //   </form>
+  // );
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Admin Login</h2>
+  <div className="flex justify-center items-center min-h-screen">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-blue-900/40 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-[350px] space-y-4 border border-blue-500/30"
+    >
+      <h2 className="text-2xl font-bold text-center text-blue-300">
+        🔐 Admin Login
+      </h2>
+
       <input
         type="email"
         placeholder="Email"
+        className="w-full p-3 rounded bg-blue-950 border border-blue-600"
         onChange={(e) => setEmail(e.target.value)}
       />
+
       <input
         type="password"
         placeholder="Password"
+        className="w-full p-3 rounded bg-blue-950 border border-blue-600"
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button type="submit">Login</button>
+
+      <button
+        type="submit"
+        className="w-full bg-gradient-to-r from-blue-500 to-blue-400 p-3 rounded-lg font-bold hover:scale-105 transition"
+      >
+        Login 🚀
+      </button>
     </form>
-  );
+  </div>
+);
 }
 
 export default Login;
