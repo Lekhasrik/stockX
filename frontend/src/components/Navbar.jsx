@@ -82,12 +82,14 @@ function Navbar() {
     { name: "Sales", path: "/sales" },
     { name: "Low Stock", path: "/low-stock" },
     { name: "Billing", path: "/billing" },
+    { name: "Sales History", path: "/sales-history" },
+    { name: "Analytics", path: "/analytics" },
   ];
 
   return (
-    <div className="bg-gray-100 px-8 py-4 border-b border-gray-200">
+    <div className="bg-white px-8 py-4 border-b border-gray-200 shadow-sm">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold text-gray-800 mr-6">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent mr-6">
           StockX
         </h1>
 
@@ -100,8 +102,8 @@ function Navbar() {
               to={link.path}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-white text-gray-700 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-ocean-500 to-teal-500 text-white shadow-md"
+                  : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-ocean-300"
               }`}
             >
               {link.name}

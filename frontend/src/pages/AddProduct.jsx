@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Toast from "../components/Toast";
 
 function AddProduct() {
   const [form, setForm] = useState({
@@ -11,16 +12,33 @@ function AddProduct() {
   });
 
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/categories")
-      .then(res => setCategories(res.data));
+      .then(res => setCategories(res.data))
+      .catch(() => setToast({ message: "Error loading categories", type: "error" }));
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post("http://localhost:5000/api/products", form)
-      .then(() => alert("Product Added"));
+    
+    if (!form.name || !form.category || !form.price || !form.stock || !form.minStock) {
+      setToast({ message: "All fields are required", type: "error" });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      await axios.post("http://localhost:5000/api/products", form);
+      setToast({ message: "Product added successfully", type: "success" });
+      setForm({ name: "", category: "", price: "", stock: "", minStock: "" });
+    } catch (error) {
+      setToast({ message: "Error adding product", type: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -53,22 +71,25 @@ function AddProduct() {
 
   return (
   <div className="flex justify-center items-center min-h-screen">
+    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     <form
       onSubmit={handleSubmit}
-      className="bg-blue-900/40 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-[400px] space-y-4 border border-blue-500/30 animate-fadeIn"
+      className="bg-white backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[400px] space-y-4 border border-gray-300 animate-fadeIn"
     >
-      <h2 className="text-2xl font-bold text-center text-blue-300">
+      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent">
         ➕ Add Product
       </h2>
 
       <input
-        className="w-full p-3 rounded-lg bg-blue-950 border border-blue-600 focus:ring-2 focus:ring-blue-400 outline-none transition"
-        placeholder="Name"
+        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none transition text-gray-800 placeholder-gray-400"
+        placeholder="Product Name"
+        value={form.name}
         onChange={e => setForm({ ...form, name: e.target.value })}
       />
 
       <select
-        className="w-full p-3 rounded-lg bg-blue-950 border border-blue-600 focus:ring-2 focus:ring-blue-400 outline-none"
+        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800"
+        value={form.category}
         onChange={e => setForm({ ...form, category: e.target.value })}
       >
         <option>Select Category</option>
@@ -78,28 +99,32 @@ function AddProduct() {
       </select>
 
       <input type="number"
-        className="w-full p-3 rounded-lg bg-blue-950 border border-blue-600"
-        placeholder="Price"
+        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
+        placeholder="Price (₹)"
+        value={form.price}
         onChange={e => setForm({ ...form, price: e.target.value })}
       />
 
       <input type="number"
-        className="w-full p-3 rounded-lg bg-blue-950 border border-blue-600"
-        placeholder="Stock"
+        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
+        placeholder="Stock Quantity"
+        value={form.stock}
         onChange={e => setForm({ ...form, stock: e.target.value })}
       />
 
       <input type="number"
-        className="w-full p-3 rounded-lg bg-blue-950 border border-blue-600"
-        placeholder="Min Stock"
+        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
+        placeholder="Minimum Stock"
+        value={form.minStock}
         onChange={e => setForm({ ...form, minStock: e.target.value })}
       />
 
       <button
         type="submit"
-        className="w-full bg-gradient-to-r from-blue-500 to-blue-400 hover:scale-105 transition transform p-3 rounded-lg font-bold shadow-lg"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 hover:scale-105 transition transform p-3 rounded-lg font-bold shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-gray-800"
       >
-        Add Product 🚀
+        {loading ? "Adding..." : "Add Product 🚀"}
       </button>
 
       
@@ -110,3 +135,4 @@ function AddProduct() {
 }
 
 export default AddProduct;
+

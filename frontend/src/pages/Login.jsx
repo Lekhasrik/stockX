@@ -58,17 +58,25 @@ import { useNavigate } from "react-router-dom";
 function Login({ setIsAdmin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    if (email === "admin@gmail.com" && password === "12345") {
-      setIsAdmin(true);
-      navigate("/");
-    } else {
-      alert("Only Admin can login ❌");
-    }
+    setTimeout(() => {
+      if (email === "admin@gmail.com" && password === "12345") {
+        localStorage.setItem("admin", "true");
+        setIsAdmin(true);
+        navigate("/");
+      } else {
+        setError("Invalid credentials. Only admin can login.");
+      }
+      setLoading(false);
+    }, 500);
   };
 
   // return (
@@ -92,31 +100,38 @@ function Login({ setIsAdmin }) {
   <div className="flex justify-center items-center min-h-screen">
     <form
       onSubmit={handleSubmit}
-      className="bg-blue-900/40 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-[350px] space-y-4 border border-blue-500/30"
+      className="bg-white p-8 rounded-2xl shadow-xl w-[350px] space-y-4 border border-gray-200"
     >
-      <h2 className="text-2xl font-bold text-center text-blue-300">
+      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent">
         🔐 Admin Login
       </h2>
+
+      {error && (
+        <div className="bg-red-50 border border-red-300 text-red-700 p-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       <input
         type="email"
         placeholder="Email"
-        className="w-full p-3 rounded bg-blue-950 border border-blue-600"
+        className="w-full p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400 outline-none text-gray-800 placeholder-gray-400"
         onChange={(e) => setEmail(e.target.value)}
       />
 
       <input
         type="password"
         placeholder="Password"
-        className="w-full p-3 rounded bg-blue-950 border border-blue-600"
+        className="w-full p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400 outline-none text-gray-800 placeholder-gray-400"
         onChange={(e) => setPassword(e.target.value)}
       />
 
       <button
         type="submit"
-        className="w-full bg-gradient-to-r from-blue-500 to-blue-400 p-3 rounded-lg font-bold hover:scale-105 transition"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 p-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed text-white"
       >
-        Login 🚀
+        {loading ? "Logging in..." : "Login 🚀"}
       </button>
     </form>
   </div>

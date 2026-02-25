@@ -1,31 +1,71 @@
 const Product = require("../models/Product");
 
 exports.addProduct = async (req, res) => {
-  const { name, category, price, stock, minStock } = req.body;
+  try {
+    const { name, category, price, stock, minStock } = req.body;
 
-  let status = "In Stock";
-  if (stock === 0) status = "Out of Stock";
-  else if (stock < minStock) status = "Low Stock";
+    if (!name || !category || !price || stock === undefined || !minStock) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-  const product = new Product({
-    name,
-    category,
-    price,
-    stock,
-    minStock,
-    status
-  });
+    let status = "In Stock";
+    if (stock === 0) status = "Out of Stock";
+    else if (stock < minStock) status = "Low Stock";
 
-  await product.save();
-  res.json(product);
+    const product = new Product({
+      name,
+      category,
+      price,
+      stock,
+      minStock,
+      status
+    });
+
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
 };
 
 exports.getProducts = async (req, res) => {
-  const products = await Product.find();
-  res.json(products);
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { name, category, price, stock, minStock } = req.body;
+    
+    let status = "In Stock";
+    if (stock === 0) status = "Out of Stock";
+    else if (stock < minStock) status = "Low Stock";
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { name, category, price, stock, minStock, status },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
 };
 
 exports.deleteProduct = async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
 };

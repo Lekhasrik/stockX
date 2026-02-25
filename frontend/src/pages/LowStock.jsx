@@ -3,14 +3,25 @@ import axios from "axios";
 
 function LowStock() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/products")
       .then(res => {
         const filtered = res.data.filter(p => p.status === "Low Stock");
         setProducts(filtered);
-      });
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-500"></div>
+      </div>
+    );
+  }
 
   // return (
   //   <div>
@@ -26,26 +37,26 @@ function LowStock() {
   // );
 
   return (
-  <div className="p-10 min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white">
+  <div className="p-10 min-h-screen">
 
-    <div className="max-w-2xl mx-auto bg-red-900/30 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-red-500/40">
+    <div className="max-w-2xl mx-auto bg-gradient-to-br from-red-900 to-red-800 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-red-500">
 
-      <h2 className="text-3xl font-bold text-red-400 mb-6">
+      <h2 className="text-4xl font-bold text-red-300 mb-6">
         ⚠ Low Stock Products
       </h2>
 
       {products.length === 0 && (
-        <p className="text-blue-300">All products are in good stock ✅</p>
+        <p className="text-gray-600 text-lg">All products are in good stock ✅</p>
       )}
 
       <ul className="space-y-4">
         {products.map(p => (
           <li
             key={p._id}
-            className="flex justify-between items-center bg-blue-950 p-4 rounded-lg border border-blue-700"
+            className="flex justify-between items-center bg-white p-4 rounded-lg border border-gray-200 hover:border-ocean-300 transition"
           >
-            <span className="font-medium">{p.name}</span>
-            <span className="text-red-400 font-semibold">
+            <span className="font-medium text-white">{p.name}</span>
+            <span className="text-red-300 font-semibold">
               Stock: {p.stock}
             </span>
           </li>
@@ -58,3 +69,4 @@ function LowStock() {
 }
 
 export default LowStock;
+

@@ -1,16 +1,18 @@
-
-
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Toast from "../components/Toast";
 
 function Billing() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/products")
-      .then(res => setProducts(res.data));
+      .then(res => setProducts(res.data))
+      .catch(() => setToast({ message: "Error loading products", type: "error" }));
   }, []);
 
   const addToCart = (product) => {
@@ -44,7 +46,13 @@ function Billing() {
 
 
 const saveBill = async () => {
+  if (cart.length === 0) {
+    setToast({ message: "Cart is empty", type: "error" });
+    return;
+  }
+
   try {
+    setLoading(true);
     const response = await axios.post(
       "http://localhost:5000/api/sales/bulk",
       {
@@ -55,8 +63,6 @@ const saveBill = async () => {
       }
     );
 
-    console.log("Backend Response:", response.data);
-
     const invoiceNumber = response.data.invoiceNumber;
     const totalAmount = response.data.totalAmount;
 
@@ -64,11 +70,12 @@ const saveBill = async () => {
 
     setCart([]);
 
-    alert("Bill Saved Successfully ✅");
+    setToast({ message: "Bill saved successfully", type: "success" });
 
   } catch (error) {
-    console.error(error);
-    alert("Error saving bill ❌");
+    setToast({ message: error.response?.data?.message || "Error saving bill", type: "error" });
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -142,17 +149,18 @@ const downloadBill = (invoiceNumber, totalAmount) => {
   // );
 
   return (
-  <div className="p-10 min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white">
+  <div className="p-10 min-h-screen">
+    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-    <h2 className="text-3xl font-bold text-blue-300 mb-8">
+    <h2 className="text-4xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent mb-8">
       🧾 Billing Dashboard
     </h2>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
       {/* Products Section */}
-      <div className="bg-blue-900/40 backdrop-blur-lg p-6 rounded-2xl shadow-2xl border border-blue-500/30 animate-fadeIn">
-        <h3 className="text-xl font-semibold mb-4 text-blue-200">
+      <div className="bg-white backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-gray-300 animate-fadeIn">
+        <h3 className="text-xl font-semibold mb-4 text-gray-600">
           Select Products
         </h3>
 
@@ -160,16 +168,16 @@ const downloadBill = (invoiceNumber, totalAmount) => {
           {products.map(p => (
             <div
               key={p._id}
-              className="flex justify-between items-center bg-blue-950 p-3 rounded-lg border border-blue-700 hover:scale-[1.02] transition"
+              className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200 hover:border-ocean-300 hover:scale-[1.02] transition"
             >
               <div>
-                <p className="font-semibold">{p.name}</p>
-                <p className="text-sm text-blue-400">₹{p.price}</p>
+                <p className="font-semibold text-white">{p.name}</p>
+                <p className="text-sm text-gray-700">₹{p.price}</p>
               </div>
 
               <button
                 onClick={() => addToCart(p)}
-                className="bg-gradient-to-r from-blue-500 to-blue-400 px-4 py-1 rounded-lg hover:scale-105 transition shadow-lg"
+                className="bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 px-4 py-1 rounded-lg hover:scale-105 transition shadow-xl text-white"
               >
                 Add
               </button>
@@ -180,24 +188,24 @@ const downloadBill = (invoiceNumber, totalAmount) => {
 
 
       {/* Cart Section */}
-      <div className="bg-blue-900/40 backdrop-blur-lg p-6 rounded-2xl shadow-2xl border border-blue-500/30 animate-fadeIn">
-        <h3 className="text-xl font-semibold mb-4 text-blue-200">
+      <div className="bg-white backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-gray-300 animate-fadeIn">
+        <h3 className="text-xl font-semibold mb-4 text-gray-600">
           Bill Items
         </h3>
 
         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
           {cart.length === 0 && (
-            <p className="text-blue-400">No items added</p>
+            <p className="text-gray-700">No items added</p>
           )}
 
           {cart.map(item => (
             <div
               key={item.name}
-              className="bg-blue-950 p-3 rounded-lg border border-blue-700"
+              className="bg-white p-3 rounded-lg border border-gray-200"
             >
               <div className="flex justify-between items-center">
-                <span className="font-medium">{item.name}</span>
-                <span>₹{item.price}</span>
+                <span className="font-medium text-white">{item.name}</span>
+                <span className="text-white">₹{item.price}</span>
               </div>
 
               <div className="flex justify-between items-center mt-2">
@@ -205,13 +213,13 @@ const downloadBill = (invoiceNumber, totalAmount) => {
                   type="number"
                   value={item.quantity}
                   min="1"
-                  className="w-16 p-1 rounded bg-blue-900 border border-blue-600 text-center"
+                  className="w-16 p-1 rounded bg-white border border-gray-300 text-center text-white"
                   onChange={(e) =>
                     updateQuantity(item.name, e.target.value)
                   }
                 />
 
-                <span className="font-semibold text-blue-300">
+                <span className="font-semibold text-gray-600">
                   ₹{item.price * item.quantity}
                 </span>
               </div>
@@ -220,8 +228,8 @@ const downloadBill = (invoiceNumber, totalAmount) => {
         </div>
 
         {/* Total */}
-        <div className="mt-6 border-t border-blue-600 pt-4">
-          <h2 className="text-2xl font-bold text-blue-300">
+        <div className="mt-6 border-t border-gray-300 pt-4">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent">
             Total: ₹{totalAmount}
           </h2>
         </div>
@@ -230,14 +238,16 @@ const downloadBill = (invoiceNumber, totalAmount) => {
         <div className="flex gap-4 mt-6">
           <button
             onClick={saveBill}
-            className="flex-1 bg-green-500 hover:bg-green-400 p-3 rounded-lg font-semibold transition hover:scale-105 shadow-lg"
+            disabled={loading || cart.length === 0}
+            className="flex-1 bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 p-3 rounded-lg font-semibold transition hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white"
           >
-            Save Bill ✅
+            {loading ? "Processing..." : "Save Bill ✅"}
           </button>
 
           <button
             onClick={() => downloadBill("Preview", totalAmount)}
-            className="flex-1 bg-blue-500 hover:bg-blue-400 p-3 rounded-lg font-semibold transition hover:scale-105 shadow-lg"
+            disabled={cart.length === 0}
+            className="flex-1 bg-gradient-to-r from-ocean-600 to-teal-600 hover:brightness-110 p-3 rounded-lg font-semibold transition hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white"
           >
             Download 📄
           </button>
@@ -250,3 +260,4 @@ const downloadBill = (invoiceNumber, totalAmount) => {
 }
 
 export default Billing;
+
