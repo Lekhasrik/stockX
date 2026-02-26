@@ -15,94 +15,76 @@ function Sales() {
       .catch(() => setToast({ message: "Error loading products", type: "error" }));
   }, []);
 
+  const selectedProduct = products.find(p => p._id === productId);
+
   const handleSale = async () => {
     if (!productId || !quantity) {
       setToast({ message: "Please select product and quantity", type: "error" });
       return;
     }
-
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/sales", {
-        productId,
-        quantity: parseInt(quantity)
-      });
+      await axios.post("http://localhost:5000/api/sales", { productId, quantity: parseInt(quantity) });
       setToast({ message: "Sale completed successfully", type: "success" });
       setProductId("");
       setQuantity("");
     } catch (err) {
       setToast({ message: err.response?.data?.message || "Error processing sale", type: "error" });
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // return (
-  //   <div>
-  //     <h2>Sales</h2>
-
-  //     <select onChange={e => setProductId(e.target.value)}>
-  //       <option>Select Product</option>
-  //       {products.map(p => (
-  //         <option key={p._id} value={p._id}>
-  //           {p.name}
-  //         </option>
-  //       ))}
-  //     </select>
-
-  //     <input type="number"
-  //       placeholder="Quantity"
-  //       onChange={e => setQuantity(e.target.value)} />
-
-  //     <button onClick={handleSale}>Sell</button>
-  //   </div>
-  // );
+  const inputCls = "w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none text-gray-800 text-sm placeholder-gray-400 transition";
 
   return (
-  <div className="p-10 min-h-screen">
-    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+    <div className="flex justify-center items-center min-h-screen bg-gray-50/50">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-    <div className="max-w-md mx-auto bg-white backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-gray-300">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-5">
+          {/* Header */}
+          <div className="text-center mb-2">
+            <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">💰</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Quick Sale</h2>
+            <p className="text-sm text-gray-400 mt-1">Record a single product sale</p>
+          </div>
 
-      <h2 className="text-4xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent mb-6 text-center">
-        💰 Sales
-      </h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Product</label>
+            <select value={productId} onChange={e => setProductId(e.target.value)}
+              className={`${inputCls} cursor-pointer`}>
+              <option value="">Select Product</option>
+              {products.map(p => (
+                <option key={p._id} value={p._id}>{p.name} — ₹{p.price.toLocaleString()} (Stock: {p.stock})</option>
+              ))}
+            </select>
+          </div>
 
-      <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Quantity</label>
+            <input type="number" placeholder="Enter quantity" value={quantity}
+              onChange={e => setQuantity(e.target.value)} className={inputCls} min="1" />
+          </div>
 
-        <select
-          onChange={e => setProductId(e.target.value)}
-          className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-blue"
-        >
-          <option>Select Product</option>
-          {products.map(p => (
-            <option key={p._id} value={p._id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+          {/* Preview */}
+          {selectedProduct && quantity > 0 && (
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Subtotal</span>
+                <span className="font-semibold text-gray-800">₹{(selectedProduct.price * parseInt(quantity || 0)).toLocaleString()}</span>
+              </div>
+            </div>
+          )}
 
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={e => setQuantity(e.target.value)}
-          className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-white placeholder-gray-400"
-        />
-
-        <button
-          onClick={handleSale}
-          disabled={loading}
-          className="w-full bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 p-3 rounded-lg font-semibold hover:scale-105 transition shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white"
-        >
-          {loading ? "Processing..." : "Sell Product 🚀"}
-        </button>
-
+          <button onClick={handleSale} disabled={loading}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? "Processing..." : "Complete Sale"}
+          </button>
+        </div>
       </div>
-
     </div>
-  </div>
-);
+  );
 }
 
 export default Sales;

@@ -22,13 +22,10 @@ function Products() {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const deleteProduct = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
-
     try {
       await axios.delete(`http://localhost:5000/api/products/${id}`);
       showToast("Product deleted successfully", "success");
@@ -38,20 +35,12 @@ function Products() {
     }
   };
 
-  const startEdit = (product) => {
-    setEditingProduct({ ...product });
-  };
-
-  const cancelEdit = () => {
-    setEditingProduct(null);
-  };
+  const startEdit = (product) => setEditingProduct({ ...product });
+  const cancelEdit = () => setEditingProduct(null);
 
   const saveEdit = async () => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/products/${editingProduct._id}`,
-        editingProduct
-      );
+      await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, editingProduct);
       showToast("Product updated successfully", "success");
       setEditingProduct(null);
       fetchProducts();
@@ -60,52 +49,67 @@ function Products() {
     }
   };
 
-  const showToast = (message, type) => {
-    setToast({ message, type });
-  };
+  const showToast = (message, type) => setToast({ message, type });
 
   const filteredProducts = products.filter((p) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter =
-      filterStatus === "All" || p.status === filterStatus;
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filterStatus === "All" || p.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
+  const statusBadge = (status) => {
+    const styles = {
+      "In Stock": "bg-green-50 text-green-700 ring-1 ring-green-200",
+      "Low Stock": "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+      "Out of Stock": "bg-red-50 text-red-600 ring-1 ring-red-200",
+    };
+    return <span className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${styles[status] || "bg-gray-50 text-gray-600"}`}>{status}</span>;
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-500"></div>
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-gray-100" />
+          <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" />
+        </div>
+        <p className="text-gray-400 text-sm animate-pulse">Loading products...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-10 min-h-screen">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+    <div className="p-6 lg:p-10 min-h-screen max-w-[1440px] mx-auto bg-gray-50/50">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      <h2 className="text-4xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent mb-8">📦 Products</h2>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">Products</h2>
+          <p className="text-gray-400 mt-1 text-sm">Manage your inventory items</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-100 rounded-xl px-4 py-2.5 shadow-sm">
+          <span className="font-semibold text-gray-800">{products.length}</span> total products
+        </div>
+      </div>
 
-      <div className="flex gap-4 mb-6 flex-wrap">
-        <input
-          type="text"
-          placeholder="🔍 Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 focus:border-teal-400 outline-none text-gray-800 placeholder-gray-400"
-        />
+      {/* Search & Filter */}
+      <div className="flex gap-3 mb-6 flex-wrap">
+        <div className="relative flex-1 min-w-[220px]">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none text-gray-800 text-sm placeholder-gray-400 shadow-sm transition"
+          />
+        </div>
 
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800"
+          className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none text-gray-700 text-sm shadow-sm cursor-pointer"
         >
           <option>All</option>
           <option>In Stock</option>
@@ -114,154 +118,96 @@ function Products() {
         </select>
       </div>
 
-      <div className="overflow-x-auto bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200">
-        <table className="w-full text-left">
-          <thead className="bg-white border-b-2 border-gray-300">
-            <tr>
-              <th className="p-4 text-gray-600 font-semibold">Name</th>
-              <th className="p-4 text-gray-600 font-semibold">Category</th>
-              <th className="p-4 text-gray-600 font-semibold">Price</th>
-              <th className="p-4 text-gray-600 font-semibold">Stock</th>
-              <th className="p-4 text-gray-600 font-semibold">Min Stock</th>
-              <th className="p-4 text-gray-600 font-semibold">Status</th>
-              <th className="p-4 text-gray-600 font-semibold">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredProducts.map((p) => (
-              <tr
-                key={p._id}
-                className="border-t border-gray-200 hover:bg-white transition"
-              >
-                {editingProduct && editingProduct._id === p._id ? (
-                  <>
-                    <td className="p-4">
-                      <input
-                        type="text"
-                        value={editingProduct.name}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 rounded bg-white border border-gray-300 text-gray-800"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="text"
-                        value={editingProduct.category}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            category: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 rounded bg-white border border-gray-300 text-gray-800"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="number"
-                        value={editingProduct.price}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            price: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 rounded bg-white border border-gray-300 text-gray-800"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="number"
-                        value={editingProduct.stock}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            stock: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 rounded bg-white border border-gray-300 text-gray-800"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="number"
-                        value={editingProduct.minStock}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            minStock: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 rounded bg-white border border-gray-300 text-gray-800"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <span className="text-sm text-gray-700">
-                        Auto-calculated
-                      </span>
-                    </td>
-                    <td className="p-4 space-x-2">
-                      <button
-                        onClick={saveEdit}
-                        className="bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 px-3 py-1 rounded-lg transition shadow-lg"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        className="bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded-lg transition"
-                      >
-                        Cancel
-                      </button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="p-4">{p.name}</td>
-                    <td className="p-4">{p.category}</td>
-                    <td className="p-4">₹{p.price}</td>
-                    <td className="p-4">{p.stock}</td>
-                    <td className="p-4">{p.minStock}</td>
-                    <td
-                      className={`p-4 font-semibold ${
-                        p.status === "Low Stock"
-                          ? "text-yellow-400"
-                          : p.status === "Out of Stock"
-                          ? "text-red-400"
-                          : "text-green-400"
-                      }`}
-                    >
-                      {p.status}
-                    </td>
-                    <td className="p-4 space-x-2">
-                      <button
-                        onClick={() => startEdit(p)}
-                        className="bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 px-3 py-1 rounded-lg transition shadow-lg"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteProduct(p._id)}
-                        className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 px-3 py-1 rounded-lg transition shadow-lg"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </>
-                )}
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left table-fixed">
+            <colgroup>
+              <col className="w-[18%]" />
+              <col className="w-[15%]" />
+              <col className="w-[12%]" />
+              <col className="w-[10%]" />
+              <col className="w-[12%]" />
+              <col className="w-[13%]" />
+              <col className="w-[20%]" />
+            </colgroup>
+            <thead>
+              <tr className="bg-gray-50/80 border-b border-gray-100">
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Category</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Stock</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Min Stock</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                <th className="px-5 py-3.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredProducts.map((p) => (
+                <tr key={p._id} className="hover:bg-blue-50/30 transition-colors">
+                  {editingProduct && editingProduct._id === p._id ? (
+                    <>
+                      <td className="px-4 py-2.5">
+                        <input type="text" value={editingProduct.name}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-gray-800 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none" />
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <input type="text" value={editingProduct.category}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-gray-800 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none" />
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <input type="number" value={editingProduct.price}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-gray-800 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none" />
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <input type="number" value={editingProduct.stock}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, stock: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-gray-800 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none" />
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <input type="number" value={editingProduct.minStock}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, minStock: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-gray-800 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none" />
+                      </td>
+                      <td className="px-4 py-2.5 text-center"><span className="text-xs text-gray-400 italic">Auto</span></td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex gap-2 whitespace-nowrap">
+                          <button onClick={saveEdit} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">Save</button>
+                          <button onClick={cancelEdit} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition">Cancel</button>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-5 py-3.5 font-medium text-gray-800 text-sm">{p.name}</td>
+                      <td className="px-5 py-3.5 text-gray-500 text-sm">{p.category}</td>
+                      <td className="px-5 py-3.5 font-semibold text-gray-800 text-sm">₹{p.price.toLocaleString()}</td>
+                      <td className="px-5 py-3.5 text-sm">
+                        <span className={`font-semibold ${p.stock <= p.minStock ? "text-red-500" : "text-gray-700"}`}>{p.stock}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-500 text-sm">{p.minStock}</td>
+                      <td className="px-5 py-3.5">{statusBadge(p.status)}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex gap-2">
+                          <button onClick={() => startEdit(p)} className="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-lg hover:bg-blue-100 transition">Edit</button>
+                          <button onClick={() => deleteProduct(p._id)} className="px-3 py-1.5 bg-red-50 text-red-500 text-xs font-medium rounded-lg hover:bg-red-100 transition">Delete</button>
+                        </div>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {filteredProducts.length === 0 && (
-          <p className="text-center text-gray-600 p-8 text-lg">No products found</p>
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-sm">No products found</p>
+          </div>
         )}
       </div>
     </div>

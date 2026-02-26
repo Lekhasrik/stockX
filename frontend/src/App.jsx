@@ -20,9 +20,9 @@ function App() {
 
   return (
     <BrowserRouter>
-      {isAdmin && <Navbar />}
+      {isAdmin && <Navbar setIsAdmin={setIsAdmin} />}
 
-      <div style={{ padding: "20px" }}>
+      <div>
         <Routes>
           <Route path="/login" element={<Login setIsAdmin={setIsAdmin} />} />
 

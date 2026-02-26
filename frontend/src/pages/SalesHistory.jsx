@@ -6,9 +6,7 @@ function SalesHistory() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetchSales();
-  }, []);
+  useEffect(() => { fetchSales(); }, []);
 
   const fetchSales = async () => {
     try {
@@ -16,10 +14,8 @@ function SalesHistory() {
       const res = await axios.get("http://localhost:5000/api/sales/history");
       setSales(res.data);
     } catch (error) {
-      alert("Error fetching sales history");
-    } finally {
-      setLoading(false);
-    }
+      console.error("Error fetching sales history");
+    } finally { setLoading(false); }
   };
 
   const filteredSales = sales.filter(sale =>
@@ -30,74 +26,81 @@ function SalesHistory() {
   const groupedByInvoice = {};
   filteredSales.forEach(sale => {
     const invoice = sale.invoiceNumber || "SINGLE";
-    if (!groupedByInvoice[invoice]) {
-      groupedByInvoice[invoice] = [];
-    }
+    if (!groupedByInvoice[invoice]) groupedByInvoice[invoice] = [];
     groupedByInvoice[invoice].push(sale);
   });
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-500"></div>
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-gray-100" />
+          <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" />
+        </div>
+        <p className="text-gray-400 text-sm animate-pulse">Loading sales history...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-10 min-h-screen">
-      <h2 className="text-4xl font-bold bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent mb-8">
-        📜 Sales History
-      </h2>
-
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="🔍 Search by product or invoice number..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-blue placeholder-gray-400"
-        />
+    <div className="p-6 lg:p-10 min-h-screen max-w-[1440px] mx-auto bg-gray-50/50">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">Sales History</h2>
+          <p className="text-gray-400 mt-1 text-sm">Browse all transactions by invoice</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-100 rounded-xl px-4 py-2.5 shadow-sm">
+          <span className="font-semibold text-gray-800">{sales.length}</span> total transactions
+        </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Search */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input type="text" placeholder="Search by product or invoice..." value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none text-gray-800 text-sm placeholder-gray-400 shadow-sm transition" />
+        </div>
+      </div>
+
+      {/* Invoice Cards */}
+      <div className="space-y-5">
         {Object.entries(groupedByInvoice).map(([invoice, items]) => {
           const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
           const date = new Date(items[0].date).toLocaleString();
 
           return (
-            <div
-              key={invoice}
-              className="bg-white backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-gray-300"
-            >
-              <div className="flex justify-between items-center mb-4">
+            <div key={invoice} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+              {/* Invoice Header */}
+              <div className="px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-600">
-                    Invoice: {invoice}
-                  </h3>
-                  <p className="text-sm text-gray-700">{date}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">{invoice}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">{date}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-green-400">
-                    ₹{total.toFixed(2)}
-                  </p>
-                </div>
+                <p className="text-xl font-bold text-gray-900">₹{total.toLocaleString()}</p>
               </div>
 
+              {/* Items Table */}
               <table className="w-full text-left">
-                <thead className="bg-white border-b-2 border-gray-300">
-                  <tr>
-                    <th className="p-3 text-gray-600">Product</th>
-                    <th className="p-3 text-gray-600">Quantity</th>
-                    <th className="p-3 text-gray-600">Price</th>
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="px-6 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wider">Product</th>
+                    <th className="px-6 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wider text-center">Qty</th>
+                    <th className="px-6 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wider text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-50">
                   {items.map((sale, idx) => (
-                    <tr key={idx} className="border-t border-gray-200">
-                      <td className="p-3 text-white">{sale.productName}</td>
-                      <td className="p-3 text-white">{sale.quantity}</td>
-                      <td className="p-3 text-white">₹{sale.totalPrice.toFixed(2)}</td>
+                    <tr key={idx} className="hover:bg-blue-50/20 transition-colors">
+                      <td className="px-6 py-3 text-sm font-medium text-gray-700">{sale.productName}</td>
+                      <td className="px-6 py-3 text-sm text-center">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gray-100 text-gray-700 font-semibold text-xs">{sale.quantity}</span>
+                      </td>
+                      <td className="px-6 py-3 text-sm text-right font-semibold text-gray-800">₹{sale.totalPrice.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -107,7 +110,9 @@ function SalesHistory() {
         })}
 
         {filteredSales.length === 0 && (
-          <p className="text-center text-gray-700 text-lg">No sales found</p>
+          <div className="text-center py-20">
+            <p className="text-gray-400 text-sm">No sales found</p>
+          </div>
         )}
       </div>
     </div>

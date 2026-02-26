@@ -3,14 +3,7 @@ import axios from "axios";
 import Toast from "../components/Toast";
 
 function AddProduct() {
-  const [form, setForm] = useState({
-    name: "",
-    category: "",
-    price: "",
-    stock: "",
-    minStock: ""
-  });
-
+  const [form, setForm] = useState({ name: "", category: "", price: "", stock: "", minStock: "" });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -23,12 +16,10 @@ function AddProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!form.name || !form.category || !form.price || !form.stock || !form.minStock) {
       setToast({ message: "All fields are required", type: "error" });
       return;
     }
-    
     try {
       setLoading(true);
       await axios.post("http://localhost:5000/api/products", form);
@@ -41,97 +32,64 @@ function AddProduct() {
     }
   };
 
-
-  // return (
-  //   <form onSubmit={handleSubmit}>
-  //     <input placeholder="Name"
-  //       onChange={e => setForm({ ...form, name: e.target.value })} />
-
-  //     <select
-  //       onChange={e => setForm({ ...form, category: e.target.value })}
-  //     >
-  //       <option>Select Category</option>
-  //       {categories.map(c => (
-  //         <option key={c._id}>{c.name}</option>
-  //       ))}
-  //     </select>
-
-  //     <input type="number" placeholder="Price"
-  //       onChange={e => setForm({ ...form, price: e.target.value })} />
-
-  //     <input type="number" placeholder="Stock"
-  //       onChange={e => setForm({ ...form, stock: e.target.value })} />
-
-  //     <input type="number" placeholder="Min Stock"
-  //       onChange={e => setForm({ ...form, minStock: e.target.value })} />
-
-  //     <button type="submit">Add Product</button>
-  //   </form>
-  // );
+  const inputCls = "w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none text-gray-800 text-sm placeholder-gray-400 transition";
 
   return (
-  <div className="flex justify-center items-center min-h-screen">
-    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[400px] space-y-4 border border-gray-300 animate-fadeIn"
-    >
-      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent">
-        ➕ Add Product
-      </h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50/50">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      <input
-        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none transition text-gray-800 placeholder-gray-400"
-        placeholder="Product Name"
-        value={form.name}
-        onChange={e => setForm({ ...form, name: e.target.value })}
-      />
+      <div className="w-full max-w-md">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-5">
+          {/* Header */}
+          <div className="text-center mb-2">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📦</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Add Product</h2>
+            <p className="text-sm text-gray-400 mt-1">Add a new item to your inventory</p>
+          </div>
 
-      <select
-        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800"
-        value={form.category}
-        onChange={e => setForm({ ...form, category: e.target.value })}
-      >
-        <option>Select Category</option>
-        {categories.map(c => (
-          <option key={c._id}>{c.name}</option>
-        ))}
-      </select>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Product Name</label>
+            <input className={inputCls} placeholder="e.g. iPhone 15 Pro" value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })} />
+          </div>
 
-      <input type="number"
-        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
-        placeholder="Price (₹)"
-        value={form.price}
-        onChange={e => setForm({ ...form, price: e.target.value })}
-      />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
+            <select className={`${inputCls} cursor-pointer`} value={form.category}
+              onChange={e => setForm({ ...form, category: e.target.value })}>
+              <option value="">Select Category</option>
+              {categories.map(c => <option key={c._id}>{c.name}</option>)}
+            </select>
+          </div>
 
-      <input type="number"
-        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
-        placeholder="Stock Quantity"
-        value={form.stock}
-        onChange={e => setForm({ ...form, stock: e.target.value })}
-      />
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Price (₹)</label>
+              <input type="number" className={inputCls} placeholder="0" value={form.price}
+                onChange={e => setForm({ ...form, price: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Stock</label>
+              <input type="number" className={inputCls} placeholder="0" value={form.stock}
+                onChange={e => setForm({ ...form, stock: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Min Stock</label>
+              <input type="number" className={inputCls} placeholder="0" value={form.minStock}
+                onChange={e => setForm({ ...form, minStock: e.target.value })} />
+            </div>
+          </div>
 
-      <input type="number"
-        className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-gray-800 placeholder-gray-400"
-        placeholder="Minimum Stock"
-        value={form.minStock}
-        onChange={e => setForm({ ...form, minStock: e.target.value })}
-      />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 hover:scale-105 transition transform p-3 rounded-lg font-bold shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-gray-800"
-      >
-        {loading ? "Adding..." : "Add Product 🚀"}
-      </button>
-
-      
-    </form>
-
-  </div>
-);
+          <button type="submit" disabled={loading}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? "Adding..." : "Add Product"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default AddProduct;

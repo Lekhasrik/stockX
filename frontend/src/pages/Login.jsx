@@ -1,58 +1,4 @@
-// import { useState } from "react";
-
-// function Login() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [error, setError] = useState("");
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-
-//     const adminEmail = "admin@gmail.com";
-//     const adminPassword = "12345";
-
-//     if (email === adminEmail && password === adminPassword) {
-//       alert("Admin Login Success 🔥");
-//     } else {
-//       setError("Only Admin can login ❌");
-//     }
-//   };
-
-//   return (
-//     <div style={styles.container}>
-//       <form onSubmit={handleSubmit} style={styles.form}>
-//         <h2>Admin Login</h2>
-
-//         {error && <p style={{ color: "red" }}>{error}</p>}
-
-//         <input
-//           type="email"
-//           placeholder="Enter Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//           style={styles.input}
-//           required
-//         />
-
-//         <input
-//           type="password"
-//           placeholder="Enter Password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           style={styles.input}
-//           required
-//         />
-
-//         <button type="submit" style={styles.button}>
-//           Login
-//         </button>
-//       </form>
-//     </div>
-//   );
-// }
-
-
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login({ setIsAdmin }) {
@@ -79,63 +25,77 @@ function Login({ setIsAdmin }) {
     }, 500);
   };
 
-  // return (
-  //   <form onSubmit={handleSubmit}>
-  //     <h2>Admin Login</h2>
-  //     <input
-  //       type="email"
-  //       placeholder="Email"
-  //       onChange={(e) => setEmail(e.target.value)}
-  //     />
-  //     <input
-  //       type="password"
-  //       placeholder="Password"
-  //       onChange={(e) => setPassword(e.target.value)}
-  //     />
-  //     <button type="submit">Login</button>
-  //   </form>
-  // );
-
   return (
-  <div className="flex justify-center items-center min-h-screen">
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-8 rounded-2xl shadow-xl w-[350px] space-y-4 border border-gray-200"
-    >
-      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-ocean-600 to-teal-500 bg-clip-text text-transparent">
-        🔐 Admin Login
-      </h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50/50">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
+          <div className="p-8">
+            {/* Logo */}
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
+              <p className="text-sm text-gray-400 mt-1">Sign in to StockX admin panel</p>
+            </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-300 text-red-700 p-3 rounded-lg text-sm">
-          {error}
+            {/* Error */}
+            {error && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100">
+                <p className="text-sm text-red-600 text-center">{error}</p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Email</label>
+                <input
+                  type="email"
+                  placeholder="admin@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-300 outline-none transition-all placeholder:text-gray-300 text-gray-800"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-300 outline-none transition-all placeholder:text-gray-300 text-gray-800"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    Signing in...
+                  </span>
+                ) : "Sign In"}
+              </button>
+            </form>
+          </div>
         </div>
-      )}
 
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400 outline-none text-gray-800 placeholder-gray-400"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400 outline-none text-gray-800 placeholder-gray-400"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-gradient-to-r from-ocean-500 to-teal-500 hover:from-ocean-600 hover:to-teal-600 p-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed text-white"
-      >
-        {loading ? "Logging in..." : "Login 🚀"}
-      </button>
-    </form>
-  </div>
-);
+        <p className="text-center text-xs text-gray-300 mt-6">StockX Inventory Management</p>
+      </div>
+    </div>
+  );
 }
 
 export default Login;
