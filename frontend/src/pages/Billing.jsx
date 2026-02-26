@@ -171,7 +171,7 @@ const downloadBill = (invoiceNumber, totalAmount) => {
               className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200 hover:border-ocean-300 hover:scale-[1.02] transition"
             >
               <div>
-                <p className="font-semibold text-white">{p.name}</p>
+                <p className="font-semibold text-blue">{p.name}</p>
                 <p className="text-sm text-gray-700">₹{p.price}</p>
               </div>
 

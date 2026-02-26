@@ -72,7 +72,7 @@ function Sales() {
 
         <select
           onChange={e => setProductId(e.target.value)}
-          className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-white"
+          className="w-full p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-blue"
         >
           <option>Select Product</option>
           {products.map(p => (

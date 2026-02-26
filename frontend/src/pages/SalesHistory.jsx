@@ -56,7 +56,7 @@ function SalesHistory() {
           placeholder="🔍 Search by product or invoice number..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-white placeholder-gray-400"
+          className="w-full max-w-md p-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ocean-400 outline-none text-blue placeholder-gray-400"
         />
       </div>
 

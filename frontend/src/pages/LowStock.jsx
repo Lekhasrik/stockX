@@ -55,7 +55,7 @@ function LowStock() {
             key={p._id}
             className="flex justify-between items-center bg-white p-4 rounded-lg border border-gray-200 hover:border-ocean-300 transition"
           >
-            <span className="font-medium text-white">{p.name}</span>
+            <span className="font-medium text-blue">{p.name}</span>
             <span className="text-red-300 font-semibold">
               Stock: {p.stock}
             </span>

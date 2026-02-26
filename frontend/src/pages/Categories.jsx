@@ -105,7 +105,7 @@ function Categories() {
             key={c._id}
             className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200 hover:scale-[1.02] hover:border-ocean-300 transition"
           >
-            <span className="text-white">{c.name}</span>
+            <span className="text-blue">{c.name}</span>
             <button
               onClick={() => deleteCategory(c._id)}
               className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 px-3 py-1 rounded-lg transition shadow-lg text-white"
