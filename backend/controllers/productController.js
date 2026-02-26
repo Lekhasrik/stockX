@@ -8,13 +8,33 @@ exports.addProduct = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Check if product with same name and category already exists
+    const existing = await Product.findOne({
+      name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
+      category: { $regex: new RegExp(`^${category.trim()}$`, "i") }
+    });
+
+    if (existing) {
+      // Increase stock and update price/minStock
+      existing.stock += Number(stock);
+      existing.price = Number(price);
+      existing.minStock = Number(minStock);
+
+      if (existing.stock === 0) existing.status = "Out of Stock";
+      else if (existing.stock < existing.minStock) existing.status = "Low Stock";
+      else existing.status = "In Stock";
+
+      await existing.save();
+      return res.json({ product: existing, merged: true, message: `Product already exists. Stock increased to ${existing.stock}` });
+    }
+
     let status = "In Stock";
     if (stock === 0) status = "Out of Stock";
     else if (stock < minStock) status = "Low Stock";
 
     const product = new Product({
-      name,
-      category,
+      name: name.trim(),
+      category: category.trim(),
       price,
       stock,
       minStock,
@@ -22,7 +42,7 @@ exports.addProduct = async (req, res) => {
     });
 
     await product.save();
-    res.json(product);
+    res.json({ product, merged: false });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }

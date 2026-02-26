@@ -22,11 +22,14 @@ function AddProduct() {
     }
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/products", form);
-      setToast({ message: "Product added successfully", type: "success" });
+      const res = await axios.post("http://localhost:5000/api/products", form);
+      const msg = res.data.merged
+        ? res.data.message
+        : "Product added successfully";
+      setToast({ message: msg, type: "success" });
       setForm({ name: "", category: "", price: "", stock: "", minStock: "" });
     } catch (error) {
-      setToast({ message: "Error adding product", type: "error" });
+      setToast({ message: error.response?.data?.message || "Error adding product", type: "error" });
     } finally {
       setLoading(false);
     }
