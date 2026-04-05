@@ -66,7 +66,6 @@ function AddProduct() {
               {categories.map(c => <option key={c._id}>{c.name}</option>)}
             </select>
           </div>
-
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Price (₹)</label>

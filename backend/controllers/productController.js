@@ -89,3 +89,33 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+exports.addStock = async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.stock += quantity;
+
+    // status update
+    if (product.stock === 0) {
+      product.status = "Out of Stock";
+    } else if (product.stock <= product.minStock) {
+      product.status = "Low Stock";
+    } else {
+      product.status = "In Stock";
+    }
+
+    await product.save();
+
+    res.json({ message: "Stock updated", product });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};

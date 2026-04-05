@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Billing from "./pages/Billing";
 import SalesHistory from "./pages/SalesHistory";
 import Analytics from "./pages/Analytics";
+import AddStock from "./pages/AddStock";
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(
@@ -36,6 +37,11 @@ function App() {
             element={isAdmin ? <Products /> : <Navigate to="/login" />}
           />
 
+          <Route
+            path="/add-stock"
+            element={isAdmin ? <AddStock /> : <Navigate to="/login" />}
+          />
+          
           <Route
             path="/add"
             element={isAdmin ? <AddProduct /> : <Navigate to="/login" />}
