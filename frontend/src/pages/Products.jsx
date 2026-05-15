@@ -14,8 +14,14 @@ function Products() {
     try {
       setLoading(true);
       // const res = await axios.get("http://localhost:5000/api/products");
-      axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-      setProducts(res.data);
+      // axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+      //const res = await axios.get("http://localhost:5000/api/products");
+console.log("API Response:", res.data);
+setProducts(res.data);
+
+      // setProducts(res.data);
     } catch (error) {
       showToast("Error fetching products", "error");
     } finally {
@@ -23,12 +29,27 @@ function Products() {
     }
   };
 
+//   const fetchProducts = async () => {
+//   try {
+//     setLoading(true);
+
+//     const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+
+//     setProducts(res.data);
+//   } catch (error) {
+//     showToast("Error fetching products", "error");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
   useEffect(() => { fetchProducts(); }, []);
 
   const deleteProduct = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      // await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/products/${id}`);
       showToast("Product deleted successfully", "success");
       fetchProducts();
     } catch (error) {
@@ -41,7 +62,8 @@ function Products() {
 
   const saveEdit = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, editingProduct);
+     // await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, editingProduct);
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/products/${editingProduct._id}`, editingProduct);
       showToast("Product updated successfully", "success");
       setEditingProduct(null);
       fetchProducts();
